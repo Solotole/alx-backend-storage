@@ -1,2 +1,2 @@
 // how to list all databases
-db
+show dbs
