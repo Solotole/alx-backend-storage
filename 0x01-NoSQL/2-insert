@@ -1,2 +1,3 @@
 // inserting into a newly made collection a document in a database passed as an option
-db.school.insertOne({"name" : "Holberton school"})
+db.school.insertOne({"name" : "Holberton school"});
+print("WriteResult({ \"nInserted\" : 1 })");
