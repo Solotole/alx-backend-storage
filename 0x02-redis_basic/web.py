@@ -6,6 +6,7 @@ from functools import wraps
 # Initialize Redis client
 r = redis.Redis()
 
+
 def cache_page(method):
     """
     Decorator to cache the result of the `get_page` function and
@@ -15,7 +16,7 @@ def cache_page(method):
         method (Callable): The function to be decorated.
 
     Returns:
-        Callable: A wrapper function that caches the result and 
+        Callable: A wrapper function that caches the result and
         tracks the access count.
     """
     @wraps(method)
@@ -37,8 +38,8 @@ def cache_page(method):
         content = method(url)
         r.setex(f"cached:{url}", 10, content)
         return content
-    
     return wrapper
+
 
 @cache_page
 def get_page(url: str) -> str:
