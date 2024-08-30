@@ -3,7 +3,7 @@
 import redis
 import uuid
 from functools import wraps
-from typing import Union, Callable, Optional, Any
+from typing import Union, Callable, Optional, Any, List
 
 
 class Cache:
@@ -53,17 +53,10 @@ class Cache:
         """
         @wraps(method)
         def wrapper(self, *args, **kwargs):
-            # Get the qualified name of the decorated method
             method_name = method.__qualname__
-
-            # Store the input arguments in the input list
             input_key = f"{method_name}:inputs"
             self._redis.rpush(input_key, str(args))
-
-            # Call the original method and get the output
             output = method(self, *args, **kwargs)
-
-            # Store the output in the output list
             output_key = f"{method_name}:outputs"
             self._redis.rpush(output_key, str(output))
 
@@ -100,7 +93,6 @@ class Cache:
         value = self._redis.get(key)
         if value is None:
             return None
-
         if fn is not None:
             return fn(value)
         else:
@@ -129,3 +121,19 @@ class Cache:
             or None if the key doesn't exist.
         """
         return self.get(key, fn=int)
+
+    def replay(method: Callable) -> None:
+        """
+        Display the history of calls of a particular function.
+        Args:
+            method (Callable): The method to replay history for.
+        """
+        method_name = method.__qualname__
+        ref = method.__self__._redis
+        inputs: List[bytes] = ref.lrange(f"{method_name}:inputs", 0, -1)
+        outputs: List[bytes] = ref.lrange(f"{method_name}:outputs", 0, -1)
+        print(f"{method_name} was called {len(inputs)} times:")
+        for input_, output in zip(inputs, outputs):
+            input_str = input_.decode("utf-8")
+            output_str = output.decode("utf-8")
+            print(f"{method_name}(*{input_str}) -> {output_str}")
