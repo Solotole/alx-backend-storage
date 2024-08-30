@@ -2,12 +2,13 @@
 import requests
 import redis
 from functools import wraps
+from typing import Callable
 
 # Initialize Redis client
 r = redis.Redis()
 
 
-def cache_page(method):
+def cache_page(method: Callable) -> Callable:
     """
     Decorator to cache the result of the `get_page` function and
     count the number of times a URL is accessed.
