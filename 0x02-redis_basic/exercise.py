@@ -2,6 +2,7 @@
 """ defining a basic class for string saving into redis """
 import redis
 import uuid
+from functools import wraps
 from typing import Union, Callable, Optional, Any
 
 
@@ -22,6 +23,25 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    def count_calls(self, method: Callable) -> Callable:
+        """
+        Decorator to count the number of calls to a method
+        and store the count in Redis.
+        Args:
+            method (Callable): The method to be decorated.
+        Returns:
+            Callable: A wrapper function that increments the call
+            count and then calls the original method.
+        """
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            method_name = method.__qualname__
+            self._redis.incr(method_name)
+            result = method(self, *args, **kwargs)
+            return result
+        return wrapper
+
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Store data in the Redis cache.
