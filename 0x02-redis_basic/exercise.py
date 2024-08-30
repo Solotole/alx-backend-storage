@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """ defining a basic class for string saving into redis """
-from redis import Redis
+import redis
 import uuid
 from typing import Union, Callable, Optional
 
@@ -19,7 +19,7 @@ class Cache:
         and flushes the database to ensure
         it starts empty.
         """
-        self._redis: Redis = Redis()
+        self._redis = redis.Redis()
         self._redis.flushdb()
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
@@ -30,6 +30,6 @@ class Cache:
         stores the data in Redis using
         this key, and returns the key.
         """
-        key: str = str(uuid.uuid4())
+        key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
