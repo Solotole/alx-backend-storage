@@ -41,6 +41,36 @@ class Cache:
             return result
         return wrapper
 
+    def call_history(method: Callable) -> Callable:
+        """
+        Decorator to store the history of inputs and outputs
+        for a particular function.
+        Args:
+            method (Callable): The method to be decorated.
+        Returns:
+            Callable: A wrapper function that logs the input arguments
+                      and output of the decorated method.
+        """
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            # Get the qualified name of the decorated method
+            method_name = method.__qualname__
+
+            # Store the input arguments in the input list
+            input_key = f"{method_name}:inputs"
+            self._redis.rpush(input_key, str(args))
+
+            # Call the original method and get the output
+            output = method(self, *args, **kwargs)
+
+            # Store the output in the output list
+            output_key = f"{method_name}:outputs"
+            self._redis.rpush(output_key, str(output))
+
+            return output
+        return wrapper
+
+    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
