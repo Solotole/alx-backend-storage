@@ -4,6 +4,7 @@ from redis import Redis
 import uuid
 from typing import Union, Callable, Optional
 
+
 class Cache:
     """
     A Cache class that interacts with a Redis
