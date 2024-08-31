@@ -8,7 +8,7 @@ from typing import Callable
 r = redis.Redis()
 
 
-def cache_page(method: Callable) -> Callable:
+def cache_page(method):
     """
     Decorator to cache the result of the `get_page` function and
     count the number of times a URL is accessed.
