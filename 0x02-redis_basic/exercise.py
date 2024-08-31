@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """ defining a basic class for string saving into redis """
 import redis
 import uuid
